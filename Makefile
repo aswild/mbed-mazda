@@ -6,6 +6,8 @@
 GCC_BIN = /opt/gcc-arm-none-eabi/bin
 PROJECT = mbed-mazda
 OBJDIR	= build
+UPLOAD_DEST = /cygdrive/n/1114bin
+
 CPPSOURCES = $(wildcard *.cpp)
 CPPOBJECTS = $(patsubst %.cpp, $(OBJDIR)/%.o, $(CPPSOURCES))
 
@@ -72,7 +74,7 @@ else
   CC_FLAGS += -DNDEBUG -Os
 endif
 
-.PHONY: all clean lst size
+.PHONY: all clean lst size upload
 
 all: $(PROJECT).bin $(PROBJ).hex size
 
@@ -80,6 +82,9 @@ all: $(PROJECT).bin $(PROBJ).hex size
 clean:
 	@#rm -f $(BINFILE) $(PROBJ).elf $(PROBJ).hex $(PROBJ).map $(PROBJ).lst $(OBJECTS) $(DEPS)
 	rm -rf $(BINFILE) $(OBJDIR)
+
+upload: all
+	cp $(BINFILE) $(UPLOAD_DEST)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)

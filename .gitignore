@@ -2,3 +2,4 @@
 build
 build/*
 *.swp
+docs/LPC111x_UserManual.pdf
