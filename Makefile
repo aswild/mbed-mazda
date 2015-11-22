@@ -116,13 +116,6 @@ $(PROBJ).elf: $(OBJECTS) $(SYS_OBJECTS)
 	@echo -e $(Y)$@$(N)
 	$(LD) $(LD_FLAGS) -T$(LINKER_SCRIPT) $(LIBRARY_PATHS) -o $@ $^ $(LIBRARIES) $(LD_SYS_LIBS)
 
-#	@echo ""
-#	@echo "*****"
-#	@echo "***** You must modify vector checksum value in *.bin and *.hex files."
-#	@echo "*****"
-#	@echo ""
-
-
 $(PROBJ).hex: $(PROBJ).elf
 	@$(OBJCOPY) -O ihex $< $@
 
