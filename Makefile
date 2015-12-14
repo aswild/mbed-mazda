@@ -44,7 +44,8 @@ SIZE	= $(GCC_BIN)/arm-none-eabi-size
 
 
 CPU = -mcpu=cortex-m0 -mthumb 
-CC_FLAGS = $(CPU) -c -g -fno-common -fmessage-length=0 -Wall -Wextra -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -MMD -MP
+CC_FLAGS = $(CPU) $(CFLAGS) -c -g -fno-common -fmessage-length=0 -Wall -Wextra \
+		   -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -MMD -MP
 CC_SYMBOLS = -D__CORTEX_M0 \
 			 -DTARGET_LPC1114 \
 			 -DTOOLCHAIN_GCC_ARM \
@@ -76,8 +77,7 @@ endif
 
 .PHONY: all clean lst size upload
 
-all: $(PROJECT).bin $(PROBJ).hex size
-
+all: $(PROJECT).bin $(PROBJ).hex lst size
 
 clean:
 	@#rm -f $(BINFILE) $(PROBJ).elf $(PROBJ).hex $(PROBJ).map $(PROBJ).lst $(OBJECTS) $(DEPS)

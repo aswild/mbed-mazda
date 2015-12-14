@@ -5,8 +5,7 @@
 //#error This program needs LPC1768 target!
 //#endif
 
-SPI spix(p5, p6, p7);
-MCP41XXX dpot(&spix, p8, 426, 50000, true);
+MCP41XXX dpot(p5, p6, p7, p8, true, 426, 50000);
 
 Serial pc(USBTX, USBRX);
 

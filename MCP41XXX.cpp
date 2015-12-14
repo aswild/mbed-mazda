@@ -1,10 +1,11 @@
 #include "MCP41XXX.h"
 #include "math.h"
 
-MCP41XXX::MCP41XXX(SPI *_spi, PinName _cs, float _r_min, float _r_max, bool _inverted) : 
-                    spi(_spi), cs(_cs), r_min(_r_min), r_max(_r_max), inverted(_inverted)
+MCP41XXX::MCP41XXX(PinName spi_mosi, PinName spi_miso, PinName spi_sck, PinName _cs,
+                   bool _inverted, float _r_min, float _r_max) : 
+    spi(spi_mosi, spi_miso, spi_sck), cs(_cs), r_min(_r_min), r_max(_r_max), inverted(_inverted)
 {
-    spi->format(16, 0);
+    spi.format(16, 0);
     cs = 1;
 
     if (inverted)
@@ -48,6 +49,6 @@ void MCP41XXX::shutdown()
 void MCP41XXX::write_command(uint16_t cmd)
 {
     cs = 0;
-    spi->write(cmd);
+    spi.write(cmd);
     cs = 1;
 }

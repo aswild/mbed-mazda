@@ -16,14 +16,15 @@
 class MCP41XXX
 {
     public:
-        MCP41XXX(SPI *_spi, PinName _cs, float _r_min=DEFAULT_R_MIN, float _r_max=DEFAULT_R_MAX, bool _inverted=false);
+        MCP41XXX(PinName spi_mosi, PinName spi_miso, PinName spi_sck, PinName _cs,
+                 bool _inverted=false, float _r_min=DEFAULT_R_MIN, float _r_max=DEFAULT_R_MAX);
 
         void set_wiper(uint8_t value);
         uint8_t set_resistance(int r);
         void shutdown();
 
     private:
-        SPI *spi;
+        SPI spi;
         DigitalOut cs;
         float r_min, r_max;
         bool inverted;
