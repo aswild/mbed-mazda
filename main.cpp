@@ -5,7 +5,7 @@
 #define LOOP_TIME_MS    40
 #define LOOP_TIME_US    (LOOP_TIME_MS * 1000)
 
-#define SERIAL_DEBUG
+//#define SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
 Serial serial(PIN_SERIAL_TX, PIN_SERIAL_RX);
 #define dprintf(format, ...) serial.printf(format, ##__VA_ARGS__)
@@ -101,7 +101,7 @@ int main()
     dprintf("6: %5d\r\n", U16_WB6);
     dprintf("0: %5d\r\n", U16_WB7);
 
-    for (i = 0; i < WHEEL_BUTTON_MAX; i++)
+    for (i = 0; i <= WHEEL_BUTTON_MAX; i++)
     {
         dprintf("Threshold %d: 0x%04X\r\n", i, WHEEL_BUTTON_THRESHOLD[i]);
     }
