@@ -13,9 +13,8 @@ Serial serial(PIN_SERIAL_TX, PIN_SERIAL_RX);
 static void dprintf(...) {}
 #endif
 
-#define WHEEL_RP 620.0
+#define WHEEL_RP 610.0
 // {{{ Wheel button thresholds - using the Preprocessor as a calculator
-#define VDD      3.3
 #define R_WB1   56.0
 #define R_WB2  149.1
 #define R_WB3  303.4
@@ -32,13 +31,21 @@ static void dprintf(...) {}
 #define U16_WB6 ((uint16_t)((65535 * R_WB6) / (R_WB6 + WHEEL_RP)))
 #define U16_WB7 ((uint16_t)((65535 * R_WB7) / (R_WB7 + WHEEL_RP)))
 
-#define THRESHOLD_VOLDOWN   U16_WB1
-#define THRESHOLD_VOLUP     U16_WB2
-#define THRESHOLD_NEXT      U16_WB3
-#define THRESHOLD_PREV      U16_WB4
-#define THRESHOLD_MODE      U16_WB5
-#define THRESHOLD_MUTE      U16_WB6
-#define THRESHOLD_IDLE      U16_WB7
+#define T_WB1 (U16_WB1 / 2)
+#define T_WB2 ((U16_WB2 + U16_WB1) / 2)
+#define T_WB3 ((U16_WB3 + U16_WB2) / 2)
+#define T_WB4 ((U16_WB4 + U16_WB3) / 2)
+#define T_WB5 ((U16_WB5 + U16_WB4) / 2)
+#define T_WB6 ((U16_WB6 + U16_WB5) / 2)
+#define T_WB7 ((U16_WB7 + U16_WB6) / 2)
+
+#define THRESHOLD_VOLDOWN   T_WB1
+#define THRESHOLD_VOLUP     T_WB2
+#define THRESHOLD_NEXT      T_WB3
+#define THRESHOLD_PREV      T_WB4
+#define THRESHOLD_MODE      T_WB5
+#define THRESHOLD_MUTE      T_WB6
+#define THRESHOLD_IDLE      T_WB7
 // }}}
 
 // MAZDA3 steering wheel controls, resistance when voltage-divided with a 500ohm pullup resistor
@@ -78,7 +85,7 @@ static inline wheel_button_t read_wheel_button()
     uint16_t val = wheel_ain.read_u16();
     int i;
 
-    for (i = WHEEL_BUTTON_MAX; i < 0; i--)
+    for (i = WHEEL_BUTTON_MAX; i > 0; i--)
     {
         if (val > WHEEL_BUTTON_THRESHOLD[i])
             break;
@@ -91,16 +98,6 @@ int main()
     wheel_button_t button;
     wheel_button_t last_button = W_IDLE;
 #ifdef SERIAL_DEBUG
-    int i;
-    
-    dprintf("1: %5d\r\n", U16_WB1);
-    dprintf("2: %5d\r\n", U16_WB2);
-    dprintf("3: %5d\r\n", U16_WB3);
-    dprintf("4: %5d\r\n", U16_WB4);
-    dprintf("5: %5d\r\n", U16_WB5);
-    dprintf("6: %5d\r\n", U16_WB6);
-    dprintf("0: %5d\r\n", U16_WB7);
-
     for (i = 0; i <= WHEEL_BUTTON_MAX; i++)
     {
         dprintf("Threshold %d: 0x%04X\r\n", i, WHEEL_BUTTON_THRESHOLD[i]);
