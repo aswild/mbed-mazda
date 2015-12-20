@@ -2,7 +2,7 @@
 #include "pin_names.h"
 #include "PioneerRemote.h"
 
-#define LOOP_TIME_MS    50
+#define LOOP_TIME_MS    40
 #define LOOP_TIME_US    (LOOP_TIME_MS * 1000)
 
 #define SERIAL_DEBUG
@@ -13,40 +13,32 @@ Serial serial(PIN_SERIAL_TX, PIN_SERIAL_RX);
 static void dprintf(...) {}
 #endif
 
-#define WHEEL_RP 500.0
+#define WHEEL_RP 620.0
 // {{{ Wheel button thresholds - using the Preprocessor as a calculator
 #define VDD      3.3
-#define R_WB0 5046.0
 #define R_WB1   56.0
 #define R_WB2  149.1
 #define R_WB3  303.4
 #define R_WB4  565.0
 #define R_WB5 1040.0
 #define R_WB6 2041.0
+#define R_WB7 5046.0
 
-#define V_WB0 (VDD / (1.0 + (WHEEL_RP / R_WB0)))
-#define V_WB1 (VDD / (1.0 + (WHEEL_RP / R_WB1)))
-#define V_WB2 (VDD / (1.0 + (WHEEL_RP / R_WB2)))
-#define V_WB3 (VDD / (1.0 + (WHEEL_RP / R_WB3)))
-#define V_WB4 (VDD / (1.0 + (WHEEL_RP / R_WB4)))
-#define V_WB5 (VDD / (1.0 + (WHEEL_RP / R_WB5)))
-#define V_WB6 (VDD / (1.0 + (WHEEL_RP / R_WB6)))
+#define U16_WB1 ((uint16_t)((65535 * R_WB1) / (R_WB1 + WHEEL_RP)))
+#define U16_WB2 ((uint16_t)((65535 * R_WB2) / (R_WB2 + WHEEL_RP)))
+#define U16_WB3 ((uint16_t)((65535 * R_WB3) / (R_WB3 + WHEEL_RP)))
+#define U16_WB4 ((uint16_t)((65535 * R_WB4) / (R_WB4 + WHEEL_RP)))
+#define U16_WB5 ((uint16_t)((65535 * R_WB5) / (R_WB5 + WHEEL_RP)))
+#define U16_WB6 ((uint16_t)((65535 * R_WB6) / (R_WB6 + WHEEL_RP)))
+#define U16_WB7 ((uint16_t)((65535 * R_WB7) / (R_WB7 + WHEEL_RP)))
 
-#define U16_WB0 ((uint16_t)(V_WB0 * 65535.0))
-#define U16_WB1 ((uint16_t)(V_WB1 * 65535.0))
-#define U16_WB2 ((uint16_t)(V_WB2 * 65535.0))
-#define U16_WB3 ((uint16_t)(V_WB3 * 65535.0))
-#define U16_WB4 ((uint16_t)(V_WB4 * 65535.0))
-#define U16_WB5 ((uint16_t)(V_WB5 * 65535.0))
-#define U16_WB6 ((uint16_t)(V_WB6 * 65535.0))
-
-#define THRESHOLD_IDLE      U16_WB0
 #define THRESHOLD_VOLDOWN   U16_WB1
 #define THRESHOLD_VOLUP     U16_WB2
 #define THRESHOLD_NEXT      U16_WB3
 #define THRESHOLD_PREV      U16_WB4
 #define THRESHOLD_MODE      U16_WB5
 #define THRESHOLD_MUTE      U16_WB6
+#define THRESHOLD_IDLE      U16_WB7
 // }}}
 
 // MAZDA3 steering wheel controls, resistance when voltage-divided with a 500ohm pullup resistor
@@ -80,6 +72,7 @@ PioneerRemote remote;
 // do nothing in ISR, ticker will wake chip from sleep and continue main()
 void loop_ticker_isr() {}
 
+// read the ADC and figure out which button it is
 static inline wheel_button_t read_wheel_button()
 {
     uint16_t val = wheel_ain.read_u16();
@@ -100,13 +93,13 @@ int main()
 #ifdef SERIAL_DEBUG
     int i;
     
-    dprintf("0: %f\r\n", V_WB0);
-    dprintf("1: %f\r\n", V_WB1);
-    dprintf("2: %f\r\n", V_WB2);
-    dprintf("3: %f\r\n", V_WB3);
-    dprintf("4: %f\r\n", V_WB4);
-    dprintf("5: %f\r\n", V_WB5);
-    dprintf("6: %f\r\n", V_WB6);
+    dprintf("1: %5d\r\n", U16_WB1);
+    dprintf("2: %5d\r\n", U16_WB2);
+    dprintf("3: %5d\r\n", U16_WB3);
+    dprintf("4: %5d\r\n", U16_WB4);
+    dprintf("5: %5d\r\n", U16_WB5);
+    dprintf("6: %5d\r\n", U16_WB6);
+    dprintf("0: %5d\r\n", U16_WB7);
 
     for (i = 0; i < WHEEL_BUTTON_MAX; i++)
     {
