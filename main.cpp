@@ -2,8 +2,10 @@
 #include "pin_names.h"
 #include "PioneerRemote.h"
 
-#define LOOP_TIME_MS    40
+#define LOOP_TIME_MS    100
 #define LOOP_TIME_US    (LOOP_TIME_MS * 1000)
+
+#define WHEEL_SAMP_COUNT 4
 
 //#define SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
@@ -82,8 +84,13 @@ void loop_ticker_isr() {}
 // read the ADC and figure out which button it is
 static inline wheel_button_t read_wheel_button()
 {
-    uint16_t val = wheel_ain.read_u16();
+    uint16_t val;
+    int sample_total = 0;
     int i;
+
+    for (i = WHEEL_SAMP_COUNT; i > 0; i++)
+        sample_total += wheel_ain.read_u16();
+    val = (uint16_t)(sample_total / WHEEL_SAMP_COUNT);
 
     for (i = WHEEL_BUTTON_MAX; i > 0; i--)
     {
