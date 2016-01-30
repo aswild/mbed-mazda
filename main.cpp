@@ -50,7 +50,7 @@ static void dprintf(...) {}
 #define THRESHOLD_IDLE      T_WB7
 // }}}
 
-// MAZDA3 steering wheel controls, resistance when voltage-divided with a 500ohm pullup resistor
+// MAZDA3 steering wheel controls, resistance when voltage-divided with a pullup resistor
 // Read analog with read_u16() which gives 0x0000-0xFFFF value. These thresholds are the lower limit
 // the function is assumed to be the highest threshold it's greater than
 #define WHEEL_BUTTON_MAX 6
