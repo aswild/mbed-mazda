@@ -5,7 +5,7 @@
 #define LOOP_TIME_MS    100
 #define LOOP_TIME_US    (LOOP_TIME_MS * 1000)
 
-#define WHEEL_SAMP_COUNT 4
+#define WHEEL_SAMP_COUNT 8
 
 //#define SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
