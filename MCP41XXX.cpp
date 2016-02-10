@@ -2,7 +2,7 @@
 #include "math.h"
 
 MCP41XXX::MCP41XXX(PinName spi_mosi, PinName spi_miso, PinName spi_sck, PinName _cs,
-                   bool _inverted, float _r_min, float _r_max) : 
+                   bool _inverted, float _r_min, float _r_max) :
     spi(spi_mosi, spi_miso, spi_sck), cs(_cs), r_min(_r_min), r_max(_r_max), inverted(_inverted)
 {
     spi.format(16, 0);
