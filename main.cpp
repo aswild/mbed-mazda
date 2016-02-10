@@ -76,7 +76,7 @@ enum wheel_button_t {
 
 Ticker loop_ticker;
 AnalogIn wheel_ain(PIN_WHEEL_AIN);
-PioneerRemote remote;
+PioneerRemote remote(PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK, PIN_POT_CS);
 
 // do nothing in ISR, ticker will wake chip from sleep and continue main()
 void loop_ticker_isr() {}

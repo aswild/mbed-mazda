@@ -5,7 +5,9 @@
 #include "PioneerRemote.h"
 #include "pin_names.h"
 
-PioneerRemote::PioneerRemote(int press_length_ms) : pot(PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK, PIN_POT_CS, true)
+PioneerRemote::PioneerRemote(PinName spi_mosi, PinName spi_miso,
+                             PinName spi_sck, PinName pot_cs, int press_length_ms) :
+    pot(spi_mosi, spi_miso, spi_sck, pot_cs, true)
 {
     pot.shutdown();
     press_length_us = press_length_ms * 1000;

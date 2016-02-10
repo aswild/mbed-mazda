@@ -41,7 +41,9 @@ const uint8_t BUTTON_VALUES[] = {
 class PioneerRemote
 {
     public:
-        PioneerRemote(int press_length_ms=DEFAULT_PRESS_LENGTH);
+        PioneerRemote(PinName spi_mosi, PinName spi_miso,
+                      PinName spi_sck, PinName pot_cs,
+                      int press_length_ms=DEFAULT_PRESS_LENGTH);
         void set_press_length(int press_length_ms);
 
         void press_button(pioneer_button_t);
