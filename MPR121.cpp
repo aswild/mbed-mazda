@@ -70,7 +70,7 @@ void MPR121::configureSettings()
         };
 
     for(int i=0; i<12; i++){
-        int result = writeMany((ELE0_T+(i*2)),electrodeThresholds,2);
+        writeMany((ELE0_T+(i*2)),electrodeThresholds,2);
     }
 
     // Proximity Settings

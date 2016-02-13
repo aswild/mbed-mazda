@@ -75,7 +75,7 @@ LIBRARY_PATHS = -L./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM
 LINKER_SCRIPT = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/LPC1768.ld
 
 CPU = -mcpu=cortex-m3 -mthumb
-CC_FLAGS = $(CPU) -c -g -fno-common -fmessage-length=0 -Wall -Wextra -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -MMD -MP
+CC_FLAGS = $(CPU) $(CFLAGS) -c -g -fno-common -fmessage-length=0 -Wall -Wextra -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -MMD -MP
 CC_FLAGS += -Wno-unused-parameter -Wno-write-strings
 CC_SYMBOLS = -DTOOLCHAIN_GCC_ARM \
              -DTOOLCHAIN_GCC \

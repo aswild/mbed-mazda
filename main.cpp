@@ -10,7 +10,7 @@
 
 #define WHEEL_SAMP_COUNT 8
 
-//#define SERIAL_DEBUG
+#define SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
 Serial serial(PIN_SERIAL_TX, PIN_SERIAL_RX);
 #define dprintf(format, ...) serial.printf(format, ##__VA_ARGS__)
@@ -25,7 +25,9 @@ static const char *WHEEL_BUTTON_STR[] = {
 };
 #define WB_STR(b) WHEEL_BUTTON_STR[b]
 #else
-static void dprintf(...) {}
+//static void dprintf(...) {}
+#define dprintf(...) {}
+#define WB_str(x) {}
 #endif
 
 #define WHEEL_RP 610.0

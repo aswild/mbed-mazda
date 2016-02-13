@@ -1,11 +1,11 @@
 /*
  * RN52.h - header file for RN52 class to handle serial communication
+ *
+ * Allen Wild, 2016
  */
 
 #ifndef __RN52_H__
 #define __RN52_H__
-
-#include "mbed.h"
 
 /*********************************
  * defines for command constants *
@@ -64,7 +64,7 @@ enum RN52_STATUS
     ERR = 0x00455252
 };
 
-#define MESSAGE_BUF_LEN 256
+#define RN52_MBUF_LEN 256
 
 class RN52
 {
@@ -74,7 +74,12 @@ class RN52
          * The message associated with the last command issued, stored
          * as a null-terminated string
          */
-        char last_message[MESSAGE_BUF_LEN];
+        char last_message[RN52_MBUF_LEN];
+
+        /**
+         * Current length (end position) of the last command's response buffer
+         */
+        int msg_len;
 
         /**
          * RN52 class constructor, takes in pin names to describe the connection
@@ -82,7 +87,7 @@ class RN52
          * rx - serial rx
          * gpio9 - mbed pin which is connected to RN-52 GPIO9, used for switching between command and data mode
          */
-        RN52(PinName tx, PinName, rx, PinName gpio9);
+        RN52(PinName tx, PinName rx, PinName gpio9);
 
         /*****************
          * Set Functions *
@@ -92,38 +97,38 @@ class RN52
          * Set the audio output routing.
          * Specify a concatenation of AUDIO_OUT_AU_x AUDIO_OUT_W_y AUDIO_OUT_R_z
          */
-        RN52_STATUS set_audio_out(const char *audio_mode);
+        void set_audio_out(const char *audio_mode);
 
         /**
          * Set extended features using S%
          * argument should be a set of EX_xxx macros or'd together
          */
-        RN52_STATUS set_ex_features(uint16_t features);
+        void set_ex_features(uint16_t features);
 
-        RN52_STATUS set_auth_mode(const char *auth_mode);
+        void set_auth_mode(const char *auth_mode);
 
         /**
          * Set bluetooth service class. Use only if needed for compatibility..
          */
-        RN52_STATUS set_service_class(uint32_t service_class);
+        void set_service_class(uint32_t service_class);
 
-        RN52_STATUS set_discovery_mask(uint8_t discovery_mask);
+        void set_discovery_mask(uint8_t discovery_mask);
 
-        RN52_STATUS set_connection_mask(uint8_t connection_mask);
+        void set_connection_mask(uint8_t connection_mask);
 
-        RN52_STATUS set_audioin_gain(uint16_t gain_a, uint16_t gain_b);
+        void set_audioin_gain(uint16_t gain_a, uint16_t gain_b);
 
-        RN52_STATUS set_device_name(const char *name);
+        void set_device_name(const char *name);
 
-        RN52_STATUS set_auth_pin(const char *pin);
+        void set_auth_pin(const char *pin);
 
-        RN52_STATUS set_speaker_gain(uint8_t gain);
+        void set_speaker_gain(uint8_t gain);
 
-        RN52_STATUS set_tone_gain(uint8_t gain);
+        void set_tone_gain(uint8_t gain);
 
-        RN52_STATUS set_connection_retry_delay(int delay);
+        void set_connection_retry_delay(int delay);
 
-        RN52_STATUS set_pairing_timeout(int timeout);
+        void set_pairing_timeout(int timeout);
 
         /*************************
          * Get Command Functions *
@@ -152,7 +157,7 @@ class RN52
         void play_pause();
 
         void reconnect();
-        RN52_STATUS disconnect(uint8_t profiles=0xFF);
+        void disconnect(uint8_t profiles=0xFF);
 
         /*********************
          * Utility Functions *
@@ -160,13 +165,18 @@ class RN52
 
         /**
          * send a command and return the response.
-         * Do not specify the trailing \r, it will be added automatically
+         * Commands should be terminated with \r
          */
-        RN52_STATUS send_command(const char *cmd);
+        void send_command(const char *cmd);
 
     protected:
-
         Serial serial;
-}
+        DigitalOut gpio9;
+
+        void serial_isr();
+        void set_cmd_str(const char *cmd, const char *str_value);
+        void set_cmd_hex(const char *cmd, int hex_value);
+        void set_cmd_dec(const char *cmd, int dec_value);
+};
 
 #endif
