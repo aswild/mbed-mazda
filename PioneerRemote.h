@@ -5,7 +5,6 @@
 #ifndef __PIONEER_REMOTE_H__
 #define __PIONEER_REMOTE_H__
 
-#include "mbed.h"
 #include "MCP41XXX.h"
 
 #define DEFAULT_PRESS_LENGTH    100

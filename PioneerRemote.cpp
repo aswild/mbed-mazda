@@ -2,6 +2,7 @@
  * Module to control Pioneer head unit via wired remote on MCP41XXX *
  ********************************************************************/
 
+#include "mbed.h"
 #include "PioneerRemote.h"
 #include "pin_names.h"
 

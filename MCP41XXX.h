@@ -5,8 +5,6 @@
 #ifndef __MCP41XXX_H__
 #define __MCP41XXX_H__
 
-#include "mbed.h"
-
 #define CMD_SETWIPER 0x1100
 #define CMD_SHUTDOWN 0x2100
 

@@ -1,3 +1,4 @@
+#include "mbed.h"
 #include "MCP41XXX.h"
 #include "math.h"
 
