@@ -17,6 +17,7 @@ endif
 BINFILE    = $(PROJECT)_$(PLATFORM).bin
 
 # Platform-specific compiler options {{{
+##################### LPC 1114 Options ########################
 ifeq ($(PLATFORM),LPC1114)
 SYS_OBJECTS   = ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/board.o \
                 ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/cmsis_nvic.o \
@@ -56,6 +57,7 @@ LD_SYS_LIBS = -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys
 UPLOAD_DEST = $(UPLOAD_DIR)/1114bin
 
 else
+##################### LPC 1768 Options ########################
 ifeq ($(PLATFORM),LPC1768)
 SYS_OBJECTS   = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/board.o \
                 ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o \
@@ -86,6 +88,7 @@ CC_SYMBOLS = -DTOOLCHAIN_GCC_ARM \
              -D__CORTEX_M3 \
              -DTARGET_M3 \
              -D__MBED__=1
+CC_SYMBOLS += -DSERIAL_DEBUG
 
 LD_FLAGS = $(CPU) -Wl,--gc-sections --specs=nano.specs -u _printf_float -u _scanf_float -Wl,--wrap,main -Wl,-Map=$(PROBJ).map,--cref
 LD_SYS_LIBS = -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys

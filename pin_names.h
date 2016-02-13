@@ -27,6 +27,9 @@
 #define PIN_RN52_RX     p14
 #define PIN_RN52_IO9    p16
 
+#define PIN_KEYPAD_SDA  p9
+#define PIN_KEYPAD_SCL  p10
+
 #else
 #error "Unsupported Target for this project"
 #endif
