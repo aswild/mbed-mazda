@@ -1,6 +1,7 @@
 #include "mbed.h"
 #include "pin_names.h"
 #include "PioneerRemote.h"
+#include "RN52.h"
 #ifdef TARGET_LPC1768
 #include "MPR121.h"
 #endif
@@ -12,8 +13,8 @@
 
 #define SERIAL_DEBUG
 #ifdef SERIAL_DEBUG
-Serial serial(PIN_SERIAL_TX, PIN_SERIAL_RX);
-#define dprintf(format, ...) serial.printf(format, ##__VA_ARGS__)
+Serial dbg_serial(PIN_SERIAL_TX, PIN_SERIAL_RX);
+#define dprintf(format, ...) dbg_serial.printf(format, ##__VA_ARGS__)
 static const char *WHEEL_BUTTON_STR[] = {
     "VOLDOWN",
     "VOLUP",
@@ -22,6 +23,9 @@ static const char *WHEEL_BUTTON_STR[] = {
     "MODE",
     "MUTE",
     "IDLE"
+#ifdef TARGET_LPC1768
+    , "STATUSCHECK"
+#endif
 };
 #define WB_STR(b) WHEEL_BUTTON_STR[b]
 #else
@@ -87,15 +91,26 @@ enum wheel_button_t {
     W_MODE,
     W_MUTE,
     W_IDLE
+#ifdef TARGET_LPC1768
+    , W_STATUSCHECK
+#endif
 };
 
-Ticker loop_ticker;
 AnalogIn wheel_ain(PIN_WHEEL_AIN);
-PioneerRemote remote(PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK, PIN_POT_CS);
+PioneerRemote pioneer(PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK, PIN_POT_CS);
+RN52 bluetooth(PIN_RN52_TX, PIN_RN52_RX, PIN_RN52_IO9, PIN_RN52_IO2);
 
-// do nothing in ISR, ticker will wake chip from sleep and continue main()
-void loop_ticker_isr() {}
+Ticker loop_ticker;
+volatile bool main_loop_continue = true;
+void loop_ticker_isr()
+{
+    // the ticker ISR sets this flag to tell the main loop to continue
+    // after THIS interrupt.  Keeps the main loop asleep if the CPU is woken
+    // up by serial interrupts
+    main_loop_continue = true;
+}
 
+/*********************** LPC1114 settings *************************/
 #ifdef TARGET_LPC1114
 // read the ADC and figure out which button it is
 static inline wheel_button_t read_wheel_button()
@@ -116,10 +131,17 @@ static inline wheel_button_t read_wheel_button()
     return (wheel_button_t)i;
 }
 
+#define PIONEER_HOLD(x) pioneer.hold_button(x)
+#define PIONEER_RELEASE() pioneer.release_button()
+
+/*********************** LPC1768 settings *************************/
 #elif defined(TARGET_LPC1768)
 I2C keypad_i2c(PIN_KEYPAD_SDA, PIN_KEYPAD_SCL);
 MPR121 keypad(&keypad_i2c, MPR121::ADD_VSS);
+DigitalOut led1(LED1);
+DigitalOut led2(LED2);
 
+// for LPC1768, use MPR121 keypad as substitute for wheel buttons
 static inline wheel_button_t read_wheel_button()
 {
     static const wheel_button_t keypad_map[] = {
@@ -131,7 +153,11 @@ static inline wheel_button_t read_wheel_button()
         W_IDLE,     // 5
         W_PREV,     // 6
         W_MUTE,     // 7
+#ifdef TARGET_LPC1768
+        W_STATUSCHECK, // 8
+#else
         W_IDLE,     // 8
+#endif
         W_IDLE,     // 9
         W_IDLE,     // 10
         W_IDLE,     // 11
@@ -144,57 +170,110 @@ static inline wheel_button_t read_wheel_button()
             break;
     return keypad_map[i];
 }
+
+#define PIONEER_HOLD(x)     dprintf("PBUTTON %d\n", (x))
+#define PIONEER_RELEASE()   dprintf("PRELEASE\n")
 #endif
 
 int main()
 {
     wheel_button_t button;
     wheel_button_t last_button = W_IDLE;
-#ifdef SERIAL_DEBUG
+
+#if defined(TARGET_LPC1114) && defined(SERIAL_DEBUG)
     int i;
-    dprintf("\n\nMBED MAZDA\n");
     for (i = 0; i <= WHEEL_BUTTON_MAX; i++)
     {
         dprintf("Threshold %d: 0x%04X\r\n", i, WHEEL_BUTTON_THRESHOLD[i]);
     }
 #endif
+#if defined(TARGET_LPC1768) && defined(SERIAL_DEBUG)
+    dbg_serial.baud(115200);
+#endif
 
+    dprintf("\n\n############## MBED MAZDA ##############\n");
+    bluetooth.init();
+    dprintf("Bluetooth init done\n");
+    bluetooth.set_user_defaults();
+    dprintf("Bluetooth defaults done\n");
+
+    dprintf("Entering main loop\n");
     loop_ticker.attach_us(&loop_ticker_isr, LOOP_TIME_US);
-
     for (;;)
     {
+        if (!main_loop_continue)
+            goto _main_sleep;
+
+        if (bluetooth.status_update)
+            bluetooth.check_status();
+#ifdef TARGET_LPC1768
+        led1 = bluetooth.is_connected;
+#endif
+
         button = read_wheel_button();
         if (button != last_button)
         {
             dprintf("Switched to button %s\r\n", WB_STR(button));
-            switch (button)
+            if (button == W_VOLDOWN)
             {
-                case W_VOLDOWN:
-                    remote.hold_button(P_VOLDOWN);
-                    break;
-                case W_VOLUP:
-                    remote.hold_button(P_VOLUP);
-                    break;
-                case W_NEXT:
-                    remote.hold_button(P_NEXT);
-                    break;
-                case W_PREV:
-                    remote.hold_button(P_PREV);
-                    break;
-                case W_MODE:
-                    remote.hold_button(P_SOURCE);
-                    break;
-                case W_MUTE:
-                    remote.hold_button(P_MUTE);
-                    break;
-                case W_IDLE:
-                default:
-                    remote.release_button();
-                    break;
+                PIONEER_HOLD(P_VOLDOWN);
             }
-
+            else if (button == W_VOLUP)
+            {
+                PIONEER_HOLD(P_VOLUP);
+            }
+            else if (button == W_IDLE)
+            {
+                PIONEER_RELEASE();
+            }
+#ifdef TARGET_LPC1768
+            else if (button == W_STATUSCHECK)
+            {
+                bluetooth.check_status();
+            }
+#endif
+            else if (bluetooth.is_connected) // XXX should be a public field, not function
+            {
+                switch (button)
+                {
+                    case W_NEXT:
+                        bluetooth.next_track();
+                        break;
+                    case W_PREV:
+                        bluetooth.prev_track();
+                        break;
+                    case W_MODE:
+                        bluetooth.voice_command();
+                        break;
+                    case W_MUTE:
+                        bluetooth.play_pause();
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (button)
+                {
+                    case W_NEXT:
+                        PIONEER_HOLD(P_NEXT);
+                        break;
+                    case W_PREV:
+                        PIONEER_HOLD(P_PREV);
+                        break;
+                    case W_MODE:
+                        PIONEER_HOLD(P_SOURCE);
+                        break;
+                    case W_MUTE:
+                        PIONEER_HOLD(P_MUTE);
+                    default:
+                        break;
+                }
+            }
             last_button = button;
         }
+        main_loop_continue = false; // Ticker ISR will reset this
+_main_sleep:
         sleep();
     }
 }
