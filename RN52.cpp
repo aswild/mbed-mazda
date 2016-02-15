@@ -27,7 +27,9 @@ extern Serial dbg_serial;
 #define dprintf(...) {}
 #endif
 
-//#define RN52_USE_PRINTF
+// use printf for now since the serial library includes it anyway
+// Will need to disable this if I have to make a TinySerial library
+#define RN52_USE_PRINTF
 
 /****************** Public Functions **************************/
 RN52::RN52(PinName tx, PinName rx, PinName _gpio9, PinName _gpio2) : serial(tx, rx), gpio9(_gpio9), gpio2(_gpio2)
@@ -177,7 +179,7 @@ void RN52::serial_rx_isr()
 
 void RN52::io2_event_isr()
 {
-    dbg_serial.puts("io2_event_isr hit\n");
+    //dbg_serial.puts("io2_event_isr hit\n");
     status_update = true;
 }
 
@@ -194,7 +196,7 @@ void RN52::response_wait(timestamp_t timeout_us)
 }
 void RN52::response_timeout_isr()
 {
-    dbg_serial.puts("response_timeout_isr hit\n");
+    //dbg_serial.puts("response_timeout_isr hit\n");
     if (response_len < (RN52_RBUF_LEN-1))
         response_buf[response_len++] = '\0';
     response_ready = true;

@@ -232,7 +232,7 @@ int main()
                 bluetooth.check_status();
             }
 #endif
-            else if (bluetooth.is_connected) // XXX should be a public field, not function
+            else if (bluetooth.is_connected)
             {
                 switch (button)
                 {
