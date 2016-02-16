@@ -29,6 +29,7 @@ class RN52
         volatile bool response_ready;
 
         volatile bool is_connected;
+        volatile bool is_streaming;
         volatile bool status_update;
 
         void init();
@@ -39,10 +40,22 @@ class RN52
         // print current config to mbed Serial interface
         //void print_config(Stream *stream_out);
 
-        void next_track();
-        void prev_track();
-        void play_pause();
-        void voice_command();
+        inline void next_track()
+        {
+            send_command("AT+\r");
+        }
+        inline void prev_track()
+        {
+            send_command("AT-\r");
+        }
+        inline void play_pause()
+        {
+            send_command("AP\r");
+        }
+        inline void voice_command()
+        {
+            send_command("P\r");
+        }
 
         void reconnect();
         void disconnect(uint8_t profiles=0xFF);

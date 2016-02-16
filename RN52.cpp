@@ -101,26 +101,10 @@ void RN52::check_status()
     dprintf("check_status: got Q=%s\n", (char*)response_buf);
     status = strtol((char*)response_buf, NULL, 16);
     is_connected = (status & 0x0400) != 0;
+    is_streaming = (status & 0x000F) == 0x000D;
     status_update = false;
 }
 
-// {{{ simple stuff
-void RN52::next_track()
-{
-    send_command("AT+\r");
-}
-void RN52::prev_track()
-{
-    send_command("AT-\r");
-}
-void RN52::play_pause()
-{
-    send_command("AP\r");
-}
-void RN52::voice_command()
-{
-    send_command("P\r");
-}
 void RN52::reboot()
 {
     send_command("R,1\r", true);
@@ -135,7 +119,6 @@ void RN52::reboot()
     }
     serial.attach(this, &RN52::serial_rx_isr, Serial::RxIrq);
 }
-// }}}
 
 void RN52::send_command(const char *cmd, bool async)
 {
