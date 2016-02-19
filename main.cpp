@@ -50,7 +50,9 @@ DigitalOut led2(LED2);
 #endif
 
 /***************** Common Definitions ******************************/
+#ifdef ENABLE_RN52
 RN52 bluetooth(PIN_RN52_TX, PIN_RN52_RX, PIN_RN52_IO9, PIN_RN52_IO2);
+#endif
 
 int main()
 {
@@ -67,10 +69,12 @@ int main()
 #endif
 
     dprintf("\n\n############## MBED MAZDA ##############\n");
+#ifdef ENABLE_RN52
     bluetooth.init();
     dprintf("Bluetooth init done\n");
     bluetooth.set_user_defaults();
     dprintf("Bluetooth defaults done\n");
+#endif
 
     dprintf("Entering main loop\n");
     loop_ticker.attach_us(&loop_ticker_isr, LOOP_TIME_US);
@@ -79,6 +83,7 @@ int main()
         if (!main_loop_continue)
             goto _main_sleep;
 
+#ifdef ENABLE_RN52
         if (bluetooth.status_update)
         {
             bluetooth.check_status();
@@ -86,6 +91,7 @@ int main()
             led1 = bluetooth.is_connected;
 #endif
         }
+#endif
 
         button = read_input_button();
         if (button != last_button)
@@ -103,13 +109,14 @@ int main()
             {
                 PIONEER_RELEASE();
             }
+#ifdef ENABLE_RN52
 #ifdef TARGET_LPC1768
             else if (button == W_STATUSCHECK)
             {
                 bluetooth.check_status();
                 led1 = bluetooth.is_connected;
             }
-#endif
+#endif // TARGET_LPC1768
             else if (bluetooth.is_connected)
             {
                 switch (button)
@@ -129,6 +136,7 @@ int main()
                         break;
                 }
             }
+#endif // ENABLE_RN52
             else
             {
                 switch (button)

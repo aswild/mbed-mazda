@@ -5,6 +5,7 @@
  * Allen Wild, 2016
  */
 
+#ifdef ENABLE_RN52
 #include "mbed.h"
 #include "RN52.h"
 #include <string.h>
@@ -225,3 +226,5 @@ bool RN52::verify_set(char cmd, const char *value)
     send_command(cmd_buf);
     return false;
 }
+
+#endif // ENABLE_RN52

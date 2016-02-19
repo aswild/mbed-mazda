@@ -88,7 +88,7 @@ CC_SYMBOLS = -DTOOLCHAIN_GCC_ARM \
              -D__CORTEX_M3 \
              -DTARGET_M3 \
              -D__MBED__=1
-CC_SYMBOLS += -DSERIAL_DEBUG
+CC_SYMBOLS += -DSERIAL_DEBUG -DENABLE_RN52
 
 LD_FLAGS = $(CPU) -Wl,--gc-sections --specs=nano.specs -u _printf_float -u _scanf_float -Wl,--wrap,main -Wl,-Map=$(PROBJ).map,--cref
 LD_SYS_LIBS = -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys

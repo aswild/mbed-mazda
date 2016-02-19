@@ -4,6 +4,7 @@
  * Allen Wild, 2016
  */
 
+#ifdef  ENABLE_RN52
 #ifndef __RN52_H__
 #define __RN52_H__
 
@@ -81,4 +82,5 @@ class RN52
         void response_wait(timestamp_t timeout_us=RN52_DEFAULT_RESP_TIMEOUT_US);
 };
 
-#endif
+#endif // __RN52_H__
+#endif // ENABLE_RN52
