@@ -20,7 +20,7 @@ input_button_t read_input_button()
     int sample_total = 0;
     int i;
 
-    for (i = WHEEL_SAMP_COUNT; i > 0; i++)
+    for (i = WHEEL_SAMP_COUNT; i > 0; i--)
         sample_total += wheel_ain.read_u16();
     val = (uint16_t)(sample_total / WHEEL_SAMP_COUNT);
 
