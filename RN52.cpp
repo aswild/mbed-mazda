@@ -35,7 +35,7 @@ extern Serial dbg_serial;
 /****************** Public Functions **************************/
 RN52::RN52(PinName tx, PinName rx, PinName _gpio9, PinName _gpio2) : serial(tx, rx), gpio9(_gpio9), gpio2(_gpio2)
 {
-    dprintf("RN52 constructor\n");
+    dprintf("RN52 constructor\r\n");
     serial.baud(115200);
     gpio9 = 1;
     
@@ -82,7 +82,7 @@ void RN52::set_user_defaults()
 
     if (need_reboot)
     {
-        dprintf("user defaults changed, rebooting\n");
+        dprintf("user defaults changed, rebooting\r\n");
         reboot();
     }
 }
@@ -99,7 +99,7 @@ void RN52::check_status()
 {
     long status;
     send_command("Q\r");
-    dprintf("check_status: got Q=%s\n", (char*)response_buf);
+    dprintf("check_status: got Q=%s\r\n", (char*)response_buf);
     status = strtol((char*)response_buf, NULL, 16);
     is_connected = (status & 0x0400) != 0;
     is_streaming = (status & 0x000F) == 0x000D;
@@ -137,7 +137,7 @@ void RN52::send_command(const char *cmd, bool async)
 void RN52::serial_rx_isr()
 {
     char c = serial.getc();
-    //dprintf("serial_rx_isr got char '%c'\n", c);
+    //dprintf("serial_rx_isr got char '%c'\r\n", c);
     
     if (c == '\r')
     {
@@ -203,10 +203,10 @@ bool RN52::verify_set(char cmd, const char *value)
     cmd_buf[2] = '\r';
 #endif
 
-    //dprintf("verify_set, sending '%s'\n", cmd_buf);
+    //dprintf("verify_set, sending '%s'\r\n", cmd_buf);
     send_command(cmd_buf);
 
-    dprintf("verify_set(%c), got response '%s'\n", cmd, response_buf);
+    dprintf("verify_set(%c), got response '%s'\r\n", cmd, response_buf);
     if (strcmp((char*)response_buf, value) == 0)
         return true;
 
@@ -222,7 +222,7 @@ bool RN52::verify_set(char cmd, const char *value)
     strcat(cmd_buf, value);
     strcat(cmd_buf, "\r");
 #endif
-    //dprintf("verify_set: sending command '%s'\n", cmd_buf);
+    //dprintf("verify_set: sending command '%s'\r\n", cmd_buf);
     send_command(cmd_buf);
     return false;
 }

@@ -120,9 +120,12 @@ else
 endif
 
 ############################# BEGIN TARGETS ###############################
-.PHONY: all clean lst hex size upload
+.PHONY: all clean lst hex size upload debug
 
 all: $(BINFILE) lst size hex
+
+debug:
+	make CFLAGS=-DSERIAL_DEBUG
 
 clean:
 	rm -rf $(BINFILE) $(OBJDIR)

@@ -45,8 +45,8 @@ PioneerRemote pioneer(PIN_SPI_MOSI, PIN_SPI_MISO, PIN_SPI_SCK, PIN_POT_CS);
 DigitalOut led1(LED1);
 DigitalOut led2(LED2);
 
-#define PIONEER_HOLD(x)     dprintf("PBUTTON %d\n", (x))
-#define PIONEER_RELEASE()   dprintf("PRELEASE\n")
+#define PIONEER_HOLD(x)     dprintf("PBUTTON %d\r\n", (x))
+#define PIONEER_RELEASE()   dprintf("PRELEASE\r\n")
 #endif
 
 /***************** Common Definitions ******************************/
@@ -68,15 +68,15 @@ int main()
     dbg_serial.baud(115200);
 #endif
 
-    dprintf("\n\n############## MBED MAZDA ##############\n");
+    dprintf("\r\n\r\n############## MBED MAZDA ##############\r\n");
 #ifdef ENABLE_RN52
     bluetooth.init();
-    dprintf("Bluetooth init done\n");
+    dprintf("Bluetooth init done\r\n");
     bluetooth.set_user_defaults();
-    dprintf("Bluetooth defaults done\n");
+    dprintf("Bluetooth defaults done\r\n");
 #endif
 
-    dprintf("Entering main loop\n");
+    dprintf("Entering main loop\r\n");
     loop_ticker.attach_us(&loop_ticker_isr, LOOP_TIME_US);
     for (;;)
     {
