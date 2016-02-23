@@ -97,30 +97,19 @@ int main()
         if (button != last_button)
         {
             dprintf("Switched to button %s\r\n", INPUT_BUTTON_STR[button]);
-            if (button == W_VOLDOWN)
-            {
-                PIONEER_HOLD(P_VOLDOWN);
-            }
-            else if (button == W_VOLUP)
-            {
-                PIONEER_HOLD(P_VOLUP);
-            }
-            else if (button == W_IDLE)
-            {
-                PIONEER_RELEASE();
-            }
+
 #ifdef ENABLE_RN52
-#ifdef TARGET_LPC1768
-            else if (button == W_STATUSCHECK)
+            if (bluetooth.is_connected)
             {
-                bluetooth.check_status();
-                led1 = bluetooth.is_connected;
-            }
-#endif // TARGET_LPC1768
-            else if (bluetooth.is_connected)
-            {
+                // button mapping when bluetooth is connected
                 switch (button)
                 {
+                    case W_VOLUP:
+                        PIONEER_HOLD(P_VOLUP);
+                        break;
+                    case W_VOLDOWN:
+                        PIONEER_HOLD(P_VOLDOWN);
+                        break;
                     case W_NEXT:
                         bluetooth.next_track();
                         break;
@@ -132,15 +121,31 @@ int main()
                         break;
                     case W_MUTE:
                         bluetooth.play_pause();
+                        break;
+#ifdef TARGET_LPC1768
+                    case W_STATUSCHECK:
+                        bluetooth.check_status();
+                        led1 = bluetooth.is_connected;
+                        break;
+#endif
+                    case W_IDLE:
                     default:
+                        PIONEER_RELEASE();
                         break;
                 }
             }
-#endif // ENABLE_RN52
             else
+#endif
             {
                 switch (button)
                 {
+                    // button mapping when bluetooth isn't connected
+                    case W_VOLUP:
+                        PIONEER_HOLD(P_VOLUP);
+                        break;
+                    case W_VOLDOWN:
+                        PIONEER_HOLD(P_VOLDOWN);
+                        break;
                     case W_NEXT:
                         PIONEER_HOLD(P_NEXT);
                         break;
@@ -152,10 +157,20 @@ int main()
                         break;
                     case W_MUTE:
                         PIONEER_HOLD(P_MUTE);
+                        break;
+#ifdef TARGET_LPC1768
+                    case W_STATUSCHECK:
+                        bluetooth.check_status();
+                        led1 = bluetooth.is_connected;
+                        break;
+#endif
+                    case W_IDLE:
                     default:
+                        PIONEER_RELEASE();
                         break;
                 }
             }
+
             last_button = button;
         }
         main_loop_continue = false; // Ticker ISR will reset this
