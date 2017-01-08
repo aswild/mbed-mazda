@@ -76,7 +76,7 @@ extern const uint16_t WHEEL_BUTTON_THRESHOLD[NUM_WHEEL_BUTTONS] = {
     THRESHOLD_MUTE,
     THRESHOLD_IDLE
 };
-extern const char *INPUT_BUTTON_STR[NUM_INPUT_BUTTONS] = {
+const char *INPUT_BUTTON_STR[NUM_INPUT_BUTTONS] = {
     "VOLDOWN",
     "VOLUP",
     "NEXT",

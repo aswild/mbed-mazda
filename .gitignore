@@ -1,5 +1,4 @@
 *.bin
-build
-build/*
 *.swp
+/obj_*
 docs/LPC111x_UserManual.pdf

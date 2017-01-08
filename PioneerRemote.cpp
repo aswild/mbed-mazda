@@ -26,7 +26,7 @@ void PioneerRemote::press_button(pioneer_button_t function)
         timeout.detach();
     pot.set_wiper(BUTTON_VALUES[function]);
     pressed = true;
-    timeout.attach_us(this, &PioneerRemote::release_button, press_length_us);
+    timeout.attach_us(Callback<void()>(this, &PioneerRemote::release_button), press_length_us);
 }
 
 void PioneerRemote::hold_button(pioneer_button_t function)

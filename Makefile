@@ -1,131 +1,86 @@
 # mbed LPC1768 and LPC1114 multi-platform makefile
 
-GCC_BIN = /opt/gcc-arm-none-eabi/bin
+# Project Config
 PROJECT = mbed-mazda
-OBJDIR  = build
 UPLOAD_DIR = /cygdrive/n
 
-CPPSOURCES = $(wildcard *.cpp)
-CPPOBJECTS = $(patsubst %.cpp, $(OBJDIR)/%.o, $(CPPSOURCES))
-OBJECTS    = $(CPPOBJECTS)
-PROBJ      = $(OBJDIR)/$(PROJECT)
-LIBRARIES     = -lmbed
+TARGET        ?= LPC1114
+CROSS_COMPILE ?= arm-none-eabi-
+MBED          ?= ./mbed
+OBJDIR        ?= obj_$(TARGET)
 
-ifndef PLATFORM
-PLATFORM = LPC1114
+# In cygwin, we can't use relative paths because the compilers don't recognize
+# them. Relative paths work though
+ifeq ($(shell echo "$(MBED)" | grep "^\."),)
+ifeq ($(shell test -d /cygdrive ; echo $$?),0)
+NEW_MBED := $(shell realpath --relative-to=$(PWD) $(MBED))
+MBED     := $(NEW_MBED)
 endif
-BINFILE    = $(PROJECT)_$(PLATFORM).bin
+endif
 
-# Platform-specific compiler options {{{
-##################### LPC 1114 Options ########################
-ifeq ($(PLATFORM),LPC1114)
-SYS_OBJECTS   = ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/board.o \
-                ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/cmsis_nvic.o \
-                ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/retarget.o \
-                ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/startup_LPC11xx.o \
-                ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/system_LPC11xx.o
-INCLUDE_PATHS = -I. \
-                -I./mbed \
-                -I./mbed/TARGET_LPC1114 \
-                -I./mbed/TARGET_LPC1114/TARGET_NXP \
-                -I./mbed/TARGET_LPC1114/TARGET_NXP/TARGET_LPC11XX_11CXX \
-                -I./mbed/TARGET_LPC1114/TARGET_NXP/TARGET_LPC11XX_11CXX/TARGET_LPC11XX \
-                -I./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM
-
-LIBRARY_PATHS = -L./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM
-LINKER_SCRIPT = ./mbed/TARGET_LPC1114/TOOLCHAIN_GCC_ARM/LPC1114.ld
-
-CPU = -mcpu=cortex-m0 -mthumb
-CC_FLAGS = $(CPU) $(CFLAGS) -c -g -fno-common -fmessage-length=0 -Wall -Wextra \
-           -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -MMD -MP
-CC_SYMBOLS = -D__CORTEX_M0 \
-             -DTARGET_LPC1114 \
-             -DTOOLCHAIN_GCC_ARM \
-             -DTOOLCHAIN_GCC \
-             -DTARGET_CORTEX_M \
-             -DARM_MATH_CM0 \
-             -DTARGET_NXP \
-             -DTARGET_M0 \
-             -DTARGET_LPC11XX \
-             -DMBED_BUILD_TIMESTAMP=1447636823.25 \
-             -D__MBED__=1 \
-             -DTARGET_LPC11XX_11CXX
-
-LD_FLAGS = $(CPU) -Wl,--gc-sections --specs=nano.specs -Wl,--wrap,main -Wl,-Map=$(PROBJ).map,--cref
-LD_SYS_LIBS = -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys
-
-UPLOAD_DEST = $(UPLOAD_DIR)/1114bin
-
-else
-##################### LPC 1768 Options ########################
-ifeq ($(PLATFORM),LPC1768)
-SYS_OBJECTS   = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/board.o \
-                ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o \
-                ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/retarget.o \
-                ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/startup_LPC17xx.o \
-                ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/system_LPC17xx.o
-INCLUDE_PATHS = -I. \
-                -I./mbed \
-                -I./mbed/TARGET_LPC1768 \
-                -I.mbed/TARGET_LPC1768/TARGET_NXP \
-                -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X \
-                -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768 \
-                -I./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM
-LIBRARY_PATHS = -L./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM
-LINKER_SCRIPT = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/LPC1768.ld
-
-CPU = -mcpu=cortex-m3 -mthumb
-CC_FLAGS = $(CPU) $(CFLAGS) -c -g -fno-common -fmessage-length=0 -Wall -Wextra -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -MMD -MP
-CC_FLAGS += -Wno-unused-parameter -Wno-write-strings
-CC_SYMBOLS = -DTOOLCHAIN_GCC_ARM \
-             -DTOOLCHAIN_GCC \
-             -DMBED_BUILD_TIMESTAMP=1448083447.58 \
-             -DARM_MATH_CM3 -DTARGET_CORTEX_M \
-             -DTARGET_LPC176X \
-             -DTARGET_NXP \
-             -DTARGET_MBED_LPC1768 \
-             -DTARGET_LPC1768 \
-             -D__CORTEX_M3 \
-             -DTARGET_M3 \
-             -D__MBED__=1
-CC_SYMBOLS += -DSERIAL_DEBUG -DENABLE_RN52
-
-LD_FLAGS = $(CPU) -Wl,--gc-sections --specs=nano.specs -u _printf_float -u _scanf_float -Wl,--wrap,main -Wl,-Map=$(PROBJ).map,--cref
-LD_SYS_LIBS = -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys
-UPLOAD_DEST = $(UPLOAD_DIR)/$(BINFILE)
-
-else
-$(error Invalid PLATFORM)
-endif # LPC1768
-endif # LPC1114 }}}
+include TARGET_$(TARGET).mk
 
 ###############################################################################
-AS        = $(GCC_BIN)/arm-none-eabi-as
-CC        = $(GCC_BIN)/arm-none-eabi-gcc
-CPP       = $(GCC_BIN)/arm-none-eabi-g++
-LD        = $(GCC_BIN)/arm-none-eabi-gcc
-OBJCOPY   = $(GCC_BIN)/arm-none-eabi-objcopy
-OBJDUMP   = $(GCC_BIN)/arm-none-eabi-objdump
-SIZE      = $(GCC_BIN)/arm-none-eabi-size
+AS        := $(CROSS_COMPILE)as
+CC        := $(CROSS_COMPILE)gcc
+CXX       := $(CROSS_COMPILE)g++
+LD        := $(CROSS_COMPILE)gcc
+OBJCOPY   := $(CROSS_COMPILE)objcopy
+OBJDUMP   := $(CROSS_COMPILE)objdump
+SIZE      := $(CROSS_COMPILE)size
+
+CXX_SRCS   = Input.cpp \
+             main.cpp \
+             MCP41XXX.cpp \
+             PioneerRemote.cpp \
+             RN52.cpp
+
+ifeq ($(TARGET),LPC1768)
+CXX_SRCS += MPR121.cpp
+endif
+
+CXX_OBJS   = $(patsubst %.cpp, $(OBJDIR)/%.o, $(CXX_SRCS))
+OBJECTS    = $(CXX_OBJS)
+PROBJ      = $(OBJDIR)/$(PROJECT)
+
+BINFILE    = $(PROJECT)_$(TARGET).bin
+
+COMMON_CFLAGS  = -g -Wall -Wextra
+USER_CFLAGS   := $(CFLAGS)
+
+MBED_INCLUDES := -I. \
+                 -I$(MBED) \
+                 -I$(MBED)/drivers \
+                 -I$(MBED)/hal \
+                 -I$(MBED)/platform
+
+CFLAGS         = $(COMMON_CFLAGS) $(SYS_CFLAGS) $(USER_CFLAGS) $(MBED_INCLUDES) $(SYS_INCLUDES)
+USER_CXXFLAGS := $(CXXFLAGS)
+CXXFLAGS       = $(COMMON_CFLAGS) -fno-rtti -std=gnu++98 \
+                 $(SYS_CFLAGS) $(USER_CXXFLAGS) -I. -I$(MBED) $(MBED_INCLUDES) $(SYS_INCLUDES)
+
+USER_LDFLAGS  := $(LDFLAGS)
+LDFLAGS        = $(SYS_LDFLAGS) $(USER_LDFLAGS)
+LIBS           = -lmbed $(SYS_LIBS)
 
 #Colors
-Y = "\e[0;33m"
-G = "\e[1;32m"
-N = "\e[0m"
+Y = \e[0;33m
+G = \e[1;32m
+N = \e[0m
 
-ifeq ($(DEBUG), 1)
-  CC_FLAGS += -DDEBUG -O0
+ifeq ($(V),1)
+quiet =
 else
-  CC_FLAGS += -DNDEBUG -Os
+quiet = @
 endif
 
 ############################# BEGIN TARGETS ###############################
 .PHONY: all clean lst hex size upload debug
 
-all: $(BINFILE) lst size hex
+all: $(BINFILE) lst hex size
 
 debug:
-	make CFLAGS=-DSERIAL_DEBUG
+	$(MAKE) CFLAGS=-DSERIAL_DEBUG
 
 clean:
 	rm -rf $(BINFILE) $(OBJDIR)
@@ -136,29 +91,31 @@ upload: all
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-$(CPPOBJECTS) : $(OBJDIR)/%.o : %.cpp | $(OBJDIR)
-	@echo -e $(Y)$@$(N)
-	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) -std=gnu++98 -fno-rtti $(INCLUDE_PATHS) -o $@ $<
-
-$(BINFILE): $(PROBJ).elf
-	@echo -e $(Y)$@$(N)
-	$(OBJCOPY) -O binary $< $@
+$(CXX_OBJS) : $(OBJDIR)/%.o : %.cpp | $(OBJDIR)
+	@printf " $(Y)CXX  $@$(N)\n"
+	$(quiet)$(CXX) $(CXXFLAGS) -MMD -MP -c -o $@ $<
 
 $(PROBJ).elf: $(OBJECTS) $(SYS_OBJECTS)
-	@echo -e $(Y)$@$(N)
-	$(LD) $(LD_FLAGS) -T$(LINKER_SCRIPT) $(LIBRARY_PATHS) -o $@ $^ $(LIBRARIES) $(LD_SYS_LIBS)
+	@printf " $(Y)LD   $@$(N)\n"
+	$(quiet)$(LD) $(LDFLAGS) -T$(LD_SCRIPT) -o $@ $^ -Wl,--start-group $(LIBS) -Wl,--end-group
+
+$(BINFILE): $(PROBJ).elf
+	@printf " $(Y)BIN  $@$(N)\n"
+	$(quiet)$(OBJCOPY) -O binary $< $@
 
 hex: $(PROBJ).hex
 $(PROBJ).hex: $(PROBJ).elf
-	@$(OBJCOPY) -O ihex $< $@
+	@printf " $(Y)HEX  $@$(N)\n"
+	$(quiet)$(OBJCOPY) -O ihex $< $@
 
 lst: $(PROBJ).lst
 $(PROBJ).lst: $(PROBJ).elf
-	@$(OBJDUMP) -Sdh $< > $@
+	@printf " $(Y)LST  $@$(N)\n"
+	$(quiet)$(OBJDUMP) -Sdh $< > $@
 
 size: $(PROBJ).elf
-	@echo -e $(G)"\nBuild complete!"$(N)
-	$(SIZE) $(PROBJ).elf
+	@printf "\n$(G)Build complete!$(N)\n$(BINFILE):\n"
+	$(quiet)$(SIZE) $(PROBJ).elf
 
 DEPS = $(OBJECTS:.o=.d) $(SYS_OBJECTS:.o=.d)
 -include $(DEPS)

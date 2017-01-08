@@ -158,7 +158,7 @@ int main()
                     case W_MUTE:
                         PIONEER_HOLD(P_MUTE);
                         break;
-#ifdef TARGET_LPC1768
+#if defined(TARGET_LPC1768) && defined(ENABLE_RN52)
                     case W_STATUSCHECK:
                         bluetooth.check_status();
                         led1 = bluetooth.is_connected;
