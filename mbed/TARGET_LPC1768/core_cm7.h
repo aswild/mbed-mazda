@@ -263,6 +263,14 @@
 #define     __O     volatile             /*!< Defines 'write only' permissions                */
 #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
 
+#ifdef __cplusplus
+  #define   __IM    volatile             /*!< Defines 'read only' permissions                 */
+#else
+  #define   __IM    volatile const       /*!< Defines 'read only' permissions                 */
+#endif
+#define     __OM    volatile             /*!< Defines 'write only' permissions                */
+#define     __IOM   volatile             /*!< Defines 'read / write' permissions              */
+
 /*@} end of group Cortex_M7 */
 
 
@@ -1746,6 +1754,8 @@ __STATIC_INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
 __STATIC_INLINE void NVIC_DisableIRQ(IRQn_Type IRQn)
 {
   NVIC->ICER[(((uint32_t)(int32_t)IRQn) >> 5UL)] = (uint32_t)(1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL));
+  __DSB();
+  __ISB();
 }
 
 
