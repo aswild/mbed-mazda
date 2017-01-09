@@ -4,11 +4,10 @@
 MBED          ?= ./mbed
 
 # Projects in this workspace
-AVAILABLE_PROJECTS = mazda \
-					 ISP
+AVAILABLE_PROJECTS =
 
 # Default Project
-PROJECT           ?= mazda
+PROJECT           ?=
 
 # Ensure the project config exists, then include it
 ifeq ($(wildcard $(PROJECT)/project.mk),)
