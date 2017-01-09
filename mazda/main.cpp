@@ -2,7 +2,7 @@
  * Main.cpp                              *
  * Main program of mbed-mazda (duh...)   *
  *                                       *
- * Allen Wild, 2016                      *
+ * Allen Wild, 2016, 2017                *
  *****************************************/
 
 #include "mbed.h"
@@ -65,7 +65,7 @@ int main()
         dprintf("Threshold %d: 0x%04X\r\n", i, WHEEL_BUTTON_THRESHOLD[i]);
 #endif
 #if defined(TARGET_LPC1768) && defined(SERIAL_DEBUG)
-    dbg_serial.baud(115200);
+    dbg_serial.baud(9600);
 #endif
 
     dprintf("\r\n\r\n############## MBED MAZDA ##############\r\n");
@@ -94,7 +94,7 @@ int main()
 #endif
 
         button = read_input_button();
-        if (button != last_button)
+        if ((button != last_button) && ((last_button == W_IDLE) || button == W_IDLE))
         {
             dprintf("Switched to button %s\r\n", INPUT_BUTTON_STR[button]);
 

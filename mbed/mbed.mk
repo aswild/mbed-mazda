@@ -46,8 +46,7 @@ BINFILE    = $(PROJECT)_$(TARGET).bin
 COMMON_CFLAGS  = -g -Wall -Wextra -Wno-unused-parameter
 USER_CFLAGS   := $(CFLAGS)
 
-MBED_INCLUDES := -I. \
-                 -I$(MBED) \
+MBED_INCLUDES := -I$(MBED) \
                  -I$(MBED)/drivers \
                  -I$(MBED)/hal \
                  -I$(MBED)/platform
@@ -57,10 +56,10 @@ ALL_INCLUDES  = -I. \
                 $(MBED_INCLUDES) \
                 $(SYS_INCLUDES)
 
-CFLAGS         = $(COMMON_CFLAGS) $(SYS_CFLAGS) $(USER_CFLAGS) $(ALL_INCLUDES)
+CFLAGS         = $(COMMON_CFLAGS) $(SYS_CFLAGS) $(PROJECT_CFLAGS) $(USER_CFLAGS) $(ALL_INCLUDES)
 USER_CXXFLAGS := $(CXXFLAGS)
 CXXFLAGS       = $(COMMON_CFLAGS) -fno-rtti -std=gnu++98 \
-                 $(SYS_CFLAGS) $(USER_CXXFLAGS) $(ALL_INCLUDES)
+                 $(SYS_CFLAGS) $(PROJECT_CXXFLAGS) $(USER_CXXFLAGS) $(ALL_INCLUDES)
 
 USER_LDFLAGS  := $(LDFLAGS)
 LDFLAGS        = $(SYS_LDFLAGS) $(USER_LDFLAGS)
@@ -89,7 +88,9 @@ clean:
 	rm -rf $(BINFILE) $(OBJDIR)
 
 upload: all
+	@rm -f $(UPLOAD_DEST)/$(BINFILE)
 	cp $(BINFILE) $(UPLOAD_DEST)
+	@sync
 
 $(CXX_OBJS) : $(OBJDIR)/%.o : $(PROJECT)/%.cpp
 	@printf " $(Y)CXX  $@$(N)\n"

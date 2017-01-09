@@ -25,7 +25,7 @@ THE SOFTWARE.
 //#include <string>
 //#include <list>
 
-#include <MPR121.h>
+#include "MPR121.h"
 
 MPR121::MPR121(I2C *i2c, Address i2cAddress)
 {

@@ -4,13 +4,17 @@
 PROJECT        = ISP
 
 # Copy destination for "make upload"
-UPLOAD_DIR     =
+UPLOAD_DIR     = /cygdrive/n
 
 # Default target
 TARGET         = LPC1768
 
 # Toolchain location (path where arm-none-eabi-gcc can be found)
+ifeq ($(shell test -d /cygdrive && echo -n yes),yes)
+TOOLCHAIN     ?= /opt/gcc-arm-none-eabi/bin
+else
 TOOLCHAIN     ?=
+endif
 
 # C/C++ source files for this project
 PROJECT_SRCS   = command_interface.cpp \
