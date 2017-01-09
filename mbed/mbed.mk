@@ -79,7 +79,7 @@ endif
 ############################# BEGIN TARGETS ###############################
 .PHONY: all clean lst hex size upload debug
 
-all: $(BINFILE) hex size
+all: $(BINFILE) size
 
 debug:
 	$(MAKE) CFLAGS=-DSERIAL_DEBUG
