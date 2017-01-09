@@ -52,10 +52,15 @@ MBED_INCLUDES := -I. \
                  -I$(MBED)/hal \
                  -I$(MBED)/platform
 
-CFLAGS         = $(COMMON_CFLAGS) $(SYS_CFLAGS) $(USER_CFLAGS) $(MBED_INCLUDES) $(SYS_INCLUDES)
+ALL_INCLUDES  = -I. \
+                $(PROJECT_INCLUDES) \
+                $(MBED_INCLUDES) \
+                $(SYS_INCLUDES)
+
+CFLAGS         = $(COMMON_CFLAGS) $(SYS_CFLAGS) $(USER_CFLAGS) $(ALL_INCLUDES)
 USER_CXXFLAGS := $(CXXFLAGS)
 CXXFLAGS       = $(COMMON_CFLAGS) -fno-rtti -std=gnu++98 \
-                 $(SYS_CFLAGS) $(USER_CXXFLAGS) -I. -I$(MBED) $(MBED_INCLUDES) $(SYS_INCLUDES)
+                 $(SYS_CFLAGS) $(USER_CXXFLAGS) $(ALL_INCLUDES)
 
 USER_LDFLAGS  := $(LDFLAGS)
 LDFLAGS        = $(SYS_LDFLAGS) $(USER_LDFLAGS)
@@ -75,7 +80,7 @@ endif
 ############################# BEGIN TARGETS ###############################
 .PHONY: all clean lst hex size upload debug
 
-all: $(BINFILE) lst hex size
+all: $(BINFILE) hex size
 
 debug:
 	$(MAKE) CFLAGS=-DSERIAL_DEBUG
@@ -86,11 +91,9 @@ clean:
 upload: all
 	cp $(BINFILE) $(UPLOAD_DEST)
 
-$(OBJDIR):
-	$(quiet)mkdir -p $(OBJDIR)
-
-$(CXX_OBJS) : $(OBJDIR)/%.o : $(PROJECT)/%.cpp | $(OBJDIR)
+$(CXX_OBJS) : $(OBJDIR)/%.o : $(PROJECT)/%.cpp
 	@printf " $(Y)CXX  $@$(N)\n"
+	@mkdir -p $(dir $@)
 	$(quiet)$(CXX) $(CXXFLAGS) -MMD -MP -c -o $@ $<
 
 $(PROBJ).elf: $(OBJECTS) $(SYS_OBJECTS)
