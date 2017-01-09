@@ -47,7 +47,7 @@ int verify_binary_data( FILE *fp, int *read_size_p, int file_size )
         return( ERROR_AT_MALLOC_FOR_VERIFY_DATA_BUFF );
 
 
-    while ( size    = fread( bf, sizeof( char ), flash_reading_size, fp ) ) {
+    while ( (size = fread( bf, sizeof( char ), flash_reading_size, fp )) != 0 ) {
 
         if ( read_size < 0x20 ) {
             for ( int i = 0; i < flash_reading_size; i += 4 ) {
@@ -65,7 +65,7 @@ int verify_binary_data( FILE *fp, int *read_size_p, int file_size )
         }
 
 
-        sprintf( command_str, "R %ld %ld\r\n", read_size, (size + 3) & ~0x3 );  //  reading size must be 4*N
+        sprintf( command_str, "R %d %d\r\n", read_size, (size + 3) & ~0x3 );  //  reading size must be 4*N
         if ( try_and_check( command_str, "0" ) )
             return ( ERROR_AT_READ_COMMAND );
 
@@ -126,7 +126,7 @@ int verify_uucoded_data( FILE *fp, int *read_size_p, int file_size )
 
     fseek( fp, 0, SEEK_SET ); // seek back to beginning of file
 
-    while ( size    = fread( bf, sizeof( char ), flash_reading_size, fp ) ) {
+    while ( (size = fread( bf, sizeof( char ), flash_reading_size, fp )) != 0 ) {
 
         if ( !read_size ) {
             //  overwriting 4 bytes data for address=0x1C
@@ -134,7 +134,7 @@ int verify_uucoded_data( FILE *fp, int *read_size_p, int file_size )
             add_isp_checksum( bf );
         }
 
-        sprintf( command_str, "R %ld %ld\r\n", read_size, (size + 3) & ~0x3 );  //  reading size must be 4*N
+        sprintf( command_str, "R %d %d\r\n", read_size, (size + 3) & ~0x3 );  //  reading size must be 4*N
         if ( try_and_check( command_str, "0" ) )
             return ( ERROR_AT_READ_COMMAND );
 

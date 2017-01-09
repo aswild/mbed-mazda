@@ -59,7 +59,7 @@ int write_uuencoded_data( FILE *fp, target_param *tpp, int *total_size_p, int fi
     for ( int i = flash_writing_size; i < transfer_size; i++ )
         b[ i ]  = 0;    //  this is not neccesary but just stuffing stuffing bytes
 
-    while ( size    = fread( b, sizeof( char ), flash_writing_size, fp ) ) {
+    while ( (size = fread( b, sizeof( char ), flash_writing_size, fp )) != 0 ) {
 
         if ( !total_size ) {
             //  overwriting 4 bytes data for address=0x1C
@@ -67,7 +67,7 @@ int write_uuencoded_data( FILE *fp, target_param *tpp, int *total_size_p, int fi
             add_isp_checksum( b );
         }
 
-        sprintf( command_str, "W %ld %ld\r\n", ram_start, transfer_size );
+        sprintf( command_str, "W %u %d\r\n", ram_start, transfer_size );
         if ( try_and_check( command_str, "0" ) )
             return ( ERROR_AT_WRITE_COMMAND );
 
@@ -131,7 +131,7 @@ int write_binary_data( FILE *fp, int ram_size, int sector_size, unsigned int ram
     if ( NULL == (b     = (char *)malloc( flash_writing_size * sizeof( char ) )) )
         return( ERROR_AT_MALLOC_FOR_WRITE_BUFF );
 
-    while ( size    = fread( b, sizeof( char ), flash_writing_size, fp ) ) {
+    while ( (size = fread( b, sizeof( char ), flash_writing_size, fp )) != 0 ) {
 
         if ( !total_size ) {
             //  overwriting 4 bytes data for address=0x1C
@@ -139,7 +139,7 @@ int write_binary_data( FILE *fp, int ram_size, int sector_size, unsigned int ram
             add_isp_checksum( b );
         }
 
-        sprintf( command_str, "W %ld %ld\r\n", ram_start, flash_writing_size );
+        sprintf( command_str, "W %u %d\r\n", ram_start, flash_writing_size );
         if ( try_and_check( command_str, "0" ) )
             return ( ERROR_AT_WRITE_COMMAND );
 
@@ -200,7 +200,7 @@ int get_flash_writing_size( int ram_size, unsigned int ram_start )
         256
     };
     int     available_size;
-    int     i;
+    size_t  i;
 
     available_size  = ram_size - (ram_start & 0xFFFF);
 

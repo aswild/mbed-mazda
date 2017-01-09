@@ -57,7 +57,7 @@ MODSERIAL::init( int txSize, int rxSize, PinName rx )
         buffer_out[RxIrq]      = 0;
         buffer_count[RxIrq]    = 0;
         buffer_overflow[RxIrq] = 0;
-        Serial::attach( this, &MODSERIAL::isr_rx, Serial::RxIrq );
+        Serial::attach( Callback<void()>(this, &MODSERIAL::isr_rx), Serial::RxIrq );
 
         buffer_size[TxIrq]     = txSize;
         buffer[TxIrq]          = txSize > 0 ? (char *)malloc(buffer_size[TxIrq]) : (char *)NULL;
@@ -65,7 +65,7 @@ MODSERIAL::init( int txSize, int rxSize, PinName rx )
         buffer_out[TxIrq]      = 0;
         buffer_count[TxIrq]    = 0;
         buffer_overflow[TxIrq] = 0;
-        Serial::attach( this, &MODSERIAL::isr_tx, Serial::TxIrq );
+        Serial::attach( Callback<void()>(this, &MODSERIAL::isr_tx), Serial::TxIrq );
     }
     else {
         error("MODSERIAL must have a defined UART to function.");

@@ -78,7 +78,7 @@ int isp_flash_write( const char *file_name )
 //  last_sector = (data_size - 1) / tpp->sector_size;
     last_sector = find_sector( data_size - 1, tpp );
 
-    if ( data_size < (CRP_WORD_OFFSET + sizeof( unsigned int )) ) {
+    if ( data_size < (int)(CRP_WORD_OFFSET + sizeof( unsigned int )) ) {
         printf( "  CRP check is not performed because data size is less than 0x300(768) bytes\r\n" );
     } else {
         if ( crp_check( fp ) ) {
@@ -103,7 +103,7 @@ int isp_flash_write( const char *file_name )
 
     printf( "\r\n  ==== flash writing ====\r\n" );
 
-    if ( err    = write_flash( fp, tpp, &transferred_size, data_size ) )
+    if ( (err = write_flash( fp, tpp, &transferred_size, data_size )) != 0 )
         return ( err );
 
     printf( "  -- %d bytes data are written\r\n", transferred_size );
@@ -126,7 +126,7 @@ int isp_flash_write( const char *file_name )
     } else {
         printf( "\r\n  ==== flash reading and verifying ====\r\n" );
 
-        if ( err    = verify_flash( fp, tpp, &transferred_size, data_size ) )
+        if ( (err    = verify_flash( fp, tpp, &transferred_size, data_size )) != 0 )
             return ( err );
 
         printf( "  -- %d bytes data are read and verified\r\n", transferred_size );

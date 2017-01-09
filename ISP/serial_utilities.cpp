@@ -41,11 +41,11 @@ void usb_serial_bridge_operation( void )
 }
 
 
-void put_string( char *s )
+void put_string( const char *s )
 {
     char            c;
 
-    while ( c = *s++ ) {
+    while ( (c = *s++) != '\0' ) {
         target.putc( c );
         toggle_led( 0 );
     }

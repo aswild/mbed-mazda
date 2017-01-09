@@ -9,8 +9,8 @@
 
 
 typedef struct  taget_param_st {
-    char            *type_name;
-    int             id;
+    const char     *type_name;
+    unsigned int    id;
     int             ram_size;
     int             flash_size;
     int             sector_size;

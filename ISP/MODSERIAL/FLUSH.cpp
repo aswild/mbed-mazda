@@ -32,6 +32,7 @@ MODSERIAL::flushBuffer(IrqType type)
     switch(type) {
         case TxIrq: _IER &= ~(1UL << 1); break;
         case RxIrq: _IER &= ~(1UL << 0); break;
+        default: break;
     }
     buffer_in[type]       = 0;
     buffer_out[type]      = 0;
@@ -40,6 +41,7 @@ MODSERIAL::flushBuffer(IrqType type)
     switch(type) {
         case TxIrq: _FCR = MODSERIAL_FIFO_TX_RESET; break;
         case RxIrq: _FCR = MODSERIAL_FIFO_RX_RESET; break;
+        default: break;
     }
     _IER = ier;
 }

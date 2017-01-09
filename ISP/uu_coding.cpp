@@ -34,10 +34,10 @@ int uudecode_a_line( char *b, char *s )
     read_size   = (*s++) - ' ';
 
     for ( int i = 0; i < read_size; i += 3 ) {
-        v        = uu_table[ *s++ ] << 18;
-        v       |= uu_table[ *s++ ] << 12;
-        v       |= uu_table[ *s++ ] <<  6;
-        v       |= uu_table[ *s++ ] <<  0;
+        v        = uu_table[ (int)(*s++) ] << 18;
+        v       |= uu_table[ (int)(*s++) ] << 12;
+        v       |= uu_table[ (int)(*s++) ] <<  6;
+        v       |= uu_table[ (int)(*s++) ] <<  0;
 
         *b++     = (v >> 16) & 0xFF;
         *b++     = (v >>  8) & 0xFF;

@@ -19,9 +19,9 @@ void user_action_waiting_indicator();
 std::string get_file_name( std::string &default_path, const char *suffix )
 {
     Ticker  led_blink;
-    int     last_slash;
+    size_t  last_slash;
 
-    last_slash  = (int)default_path.rfind( "/" );
+    last_slash  = default_path.rfind( "/" );
 
     if ( last_slash == std::string::npos ) {
         default_path.clear();
@@ -42,7 +42,7 @@ std::string get_file_name( std::string &default_path, const char *suffix )
     DirectoryList               dir( path_name );
     std::vector<std::string>    list;
 
-    for ( int i = 0; i < dir.size(); i++ ) {
+    for ( size_t i = 0; i < dir.size(); i++ ) {
         if ( dir[ i ] == file_name ) {
             return ( default_path );
         }
@@ -77,7 +77,7 @@ std::string get_file_name( std::string &default_path, const char *suffix )
     show_file_list( list );
 
     int     done    = false;
-    int     index   = 0;
+    size_t  index   = 0;
     int     c;
 
     printf( FORMAT_FOR_SELECTED_FILE_NAME, index, list[ index ].c_str() );
@@ -159,7 +159,7 @@ void show_file_list( std::vector<std::string> list )
 {
     int width;
     int height;
-    int d_i;
+    size_t d_i;
 
     width   = (list.size() / 5) + 1;
     width   = (4 < width) ? 4 : width;
@@ -173,7 +173,7 @@ void show_file_list( std::vector<std::string> list )
             if ( list.size() <= d_i )
                 break;
 
-            printf( "  %3d : %-12s", d_i, list[ d_i ].c_str() );
+            printf( "  %3u : %-12s", d_i, list[ d_i ].c_str() );
         }
         printf( "\r\n" );
     }

@@ -4,7 +4,7 @@
 #include    "_user_settings.h"
 
 
-int try_and_check( char *command, char *expected_return_str )
+int try_and_check( const char *command, const char *expected_return_str )
 {
     char    rtn_str[ STR_BUFF_SIZE ];
     int     result  = 1;
@@ -22,7 +22,7 @@ int try_and_check( char *command, char *expected_return_str )
 }
 
 
-int try_and_check2( char *command, char *expected_return_str )
+int try_and_check2( const char *command, const char *expected_return_str )
 {
     char    rtn_str[ STR_BUFF_SIZE ];
     int     result  = 1;
@@ -41,7 +41,7 @@ int try_and_check2( char *command, char *expected_return_str )
 }
 
 
-void print_command( char *command )
+void print_command( const char *command )
 {
 #ifndef SUPPRESS_COMMAND_RESULT_MESSAGE
 

@@ -80,7 +80,7 @@ MODSERIAL::rxBufferEmpty( void )
 bool
 MODSERIAL::txIsBusy( void )
 {
-    return ( _LSR & ( 3UL << 5 ) == 0 ) ? true : false;
+    return ( (_LSR & ( 3UL << 5 )) == 0 ) ? true : false;
 }
 
 void

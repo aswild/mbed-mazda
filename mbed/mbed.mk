@@ -43,7 +43,7 @@ PROBJ      = $(OBJDIR)/$(PROJECT)
 
 BINFILE    = $(PROJECT)_$(TARGET).bin
 
-COMMON_CFLAGS  = -g -Wall -Wextra
+COMMON_CFLAGS  = -g -Wall -Wextra -Wno-unused-parameter
 USER_CFLAGS   := $(CFLAGS)
 
 MBED_INCLUDES := -I. \

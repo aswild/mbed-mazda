@@ -29,11 +29,11 @@ target_param    target_table[]  = {
 
 target_param *find_target_param( char *device_id_string )
 {
-    int     id;
+    unsigned int id;
 
     id  = atoi( device_id_string );
 
-    for ( int i = 1; i < (sizeof( target_table ) / sizeof( target_param )); i++ ) {
+    for ( size_t i = 1; i < (sizeof( target_table ) / sizeof( target_param )); i++ ) {
         if ( id == target_table[ i ].id )
             return ( &(target_table[ i ]) );
     }
